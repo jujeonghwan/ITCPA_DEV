@@ -2,6 +2,7 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql2');
+require('dotenv').config();
 
 const app = express();
 
@@ -9,33 +10,17 @@ app.use(cors());
 app.use(bodyparser.json());
 
 // database connection
-// local mysql
-// const db = mysql.createConnection({
-//   host:'localhost',
-//   user:'root',
-//   password:'root',
-//   database:'itcpadb',
-//   port:3306
-// });
-
-// Azure Database for MySQL server 
 const db = mysql.createConnection({
-  host:'itcpa-mysql.mysql.database.azure.com',
-  user:'mysqladmin@itcpa-mysql',
-  password:'#MySQL2022admin!',
-  database:'simpledb',
-  port:3306
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT
 });
 
 // check database connection
 db.connect(err => {
   if (err) { console.log('dberr'); }
-  console.log('database connected...');
-});
-
-// check database connection
-db.connect(err => {
-  if (err) { console.log(err, 'dberr')}
   console.log('database connected...');
 });
 
@@ -137,7 +122,6 @@ app.delete('/user/:id',(req,res)=>{
       })
   });
 });
-
 
 app.listen(3000, () => {
   console.log('server running...');
