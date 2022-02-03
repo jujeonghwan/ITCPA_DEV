@@ -1,7 +1,8 @@
-const express = require('express');
+const Joi = require('joi');
 const bodyparser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql2');
+const express = require('express');
 require('dotenv').config();
 
 const app = express();
@@ -24,6 +25,14 @@ db.connect(err => {
   console.log('database connected...');
 });
 
+////////////////////////////////////////////////////////////////////////////////
+// root
+app.get('/', (req, res) => {
+  res.send('ITCPA API!!!');
+});
+
+////////////////////////////////////////////////////////////////////////////////
+// sammple code for crud
 // get all data
 app.get('/user', (req,res) => {
   let qr = 'SELECT * FROM user';
@@ -71,6 +80,21 @@ app.post('/user', (req, res) => {
 
   // console.log('postdata');
   console.log(req.body, 'createdata');
+
+  ////////////////////////////////////////
+  // Validation with joi // require('joi');
+  const schema = {
+    fullName: Joi.string().min(3).required()
+  }
+  const result = Joi.ValidationError(req.body, schema);
+  
+  if (result.error) {
+    res.status(400).send(result.error.details[0].message);
+    return;
+  }
+  // Validation with joi
+  ////////////////////////////////////////
+
 
   let fullName = req.body.fullname;
   let eMail = req.body.email;
@@ -123,6 +147,8 @@ app.delete('/user/:id',(req,res)=>{
   });
 });
 
-app.listen(3000, () => {
-  console.log('server running...');
+// PORT
+const port =  process.env.EXPRESS_PORT || 3000;
+app.listen(port, () => {
+  console.log(`server running on port ${port}...`);
 });
